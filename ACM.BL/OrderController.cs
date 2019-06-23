@@ -24,11 +24,17 @@ namespace ACM.BL
         }
 
 
-        public void PlaceOrder(Customer customer, 
+        public OperationResult PlaceOrder(Customer customer, 
                                 Order order, 
                                 Payment payment, 
                                 bool allowSplitOrders, bool emailReceipt )
         {
+
+            if (customer == null) throw new ArgumentException("Customer instance is null");
+            if (order == null) throw new ArgumentException("Order instance is null");
+            if (payment == null) throw new ArgumentException("Payment instance is null");
+            var op = new OperationResult();
+
             customerRepository.Add(customer);
 
             OrderRepository.Add(order);
@@ -47,10 +53,18 @@ namespace ACM.BL
 
                         emailLibrary.SendEmail(customer.Email, "Here is your receipt");
                 }
-
+                else
+                {
+                    //log message 
+                    if (result.MessageList.Any())
+                    {
+                        op.AddMessage(result.MessageList[0]);
+                    }
+                }
                 
 
             }
+            return op;
         }
     }
 }
